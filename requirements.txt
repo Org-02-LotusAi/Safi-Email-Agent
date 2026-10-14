@@ -1,0 +1,7 @@
+# SAFI Product 009 — runtime dependencies
+pypdf>=5,<8            # PDF text extraction (attachments)
+python-docx>=1.1       # DOCX text extraction (attachments)
+PyYAML>=6              # agents.yaml configuration
+anthropic>=0.40        # live LLM endpoint (imported lazily; not needed for offline demo/tests)
+fastapi>=0.110          # HTTP API for external callers (safi/api.py)
+uvicorn[standard]>=0.29 # ASGI server for `safi api`

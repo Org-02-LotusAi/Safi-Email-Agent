@@ -1,0 +1,9 @@
+[project]
+name = "safi-agent-service"
+version = "0.9.0"
+description = "SAFI Product 009 — Trainable Agent Service with Email Interface"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

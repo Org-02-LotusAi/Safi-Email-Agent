@@ -1,0 +1,20 @@
+[Unit]
+Description=SAFI Trainable Agent Service - HTTP API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+# Adjust WorkingDirectory to wherever the codebase was uploaded (must contain the `safi/` package and agents.yaml):
+WorkingDirectory=/home/ubuntu/newSafi
+# Secrets live here (ANTHROPIC_API_KEY, SAFI_API_KEY, SAFI_LLM). Never commit this file. chmod 600.
+EnvironmentFile=/home/ubuntu/newSafi/.env
+# Bind to 0.0.0.0 so the meeting-manager platform can reach it. Use the venv python if you made one
+# (e.g. /home/ubuntu/newSafi/.venv/bin/python), otherwise system python3.
+ExecStart=/usr/bin/python3 -m safi api --config agents.yaml --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

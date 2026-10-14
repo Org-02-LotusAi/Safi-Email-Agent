@@ -1,0 +1,83 @@
+# SAFI Product 009 — example multi-agent configuration (doc §3, §34).
+#
+# Copy this file to `agents.yaml` and edit the mailbox/private_senders values for your
+# environment. Secrets (IMAP/SMTP passwords) are NEVER written here directly — reference
+# an environment variable name via `password_env`, and set that variable in your shell or
+# in a local `.env` file that is never committed (see `.env.example`).
+#
+# Doc §34: each agent owns exactly ONE ordinary mailbox. There is no shared-mailbox
+# multi-agent routing in this product — reply-agent and schedule-agent are two fully
+# independent Trainable Agent Instances running the same generic code.
+
+db_path: ./data/safi.sqlite
+files_dir: ./data/files
+
+# Model used when an agent entry does not specify its own `model:`.
+default_model: claude-sonnet-4-5
+
+# "reply" sends a controlled rejection email to unauthorized Private senders (doc §11).
+# "ignore" silently drops them (still logged).
+reject_policy: reply
+
+# Seconds to wait between IMAP IDLE/poll cycles when idle_wait falls back to polling.
+poll_interval: 60
+
+agents:
+  # --- Agent-001: general correspondence assistant ---------------------------
+  - agent_id: reply-agent
+    name: Reply Agent
+    mailbox: reply-agent@example.com
+    model: claude-sonnet-4-5
+    enabled: true
+
+    # Addresses authorized to train this agent via `Subject: Private` (doc §10).
+    private_senders:
+      - owner@example.com
+
+    # Bootstrap training applied once, the first time this agent has no training rows
+    # yet (equivalent to sending an authorized Private message at setup time, doc §26).
+    seed_training:
+      - "Always reply concisely and professionally."
+      - "Our standard payment term is Net 30. Do not offer Net 60 without explicit approval."
+
+    imap:
+      host: imap.example.com
+      port: 993
+      user: reply-agent@example.com
+      password_env: REPLY_AGENT_IMAP_PASSWORD
+      ssl: true
+
+    smtp:
+      host: smtp.example.com
+      port: 587
+      user: reply-agent@example.com
+      password_env: REPLY_AGENT_SMTP_PASSWORD
+      starttls: true
+
+  # --- Agent-002: scheduling assistant ---------------------------------------
+  - agent_id: schedule-agent
+    name: Schedule Agent
+    mailbox: schedule-agent@example.com
+    model: claude-sonnet-4-5
+    enabled: true
+
+    private_senders:
+      - owner@example.com
+
+    seed_training:
+      - "Propose meeting times only within business hours, Mon-Fri 9am-5pm."
+      - "Always confirm timezone explicitly before finalizing a meeting."
+
+    imap:
+      host: imap.example.com
+      port: 993
+      user: schedule-agent@example.com
+      password_env: SCHEDULE_AGENT_IMAP_PASSWORD
+      ssl: true
+
+    smtp:
+      host: smtp.example.com
+      port: 587
+      user: schedule-agent@example.com
+      password_env: SCHEDULE_AGENT_SMTP_PASSWORD
+      starttls: true

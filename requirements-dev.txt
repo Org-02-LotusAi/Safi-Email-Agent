@@ -1,0 +1,4 @@
+# SAFI Product 009 — test/dev dependencies (in addition to requirements.txt)
+-r requirements.txt
+pytest>=8
+fpdf2>=2.7             # synthesize known-text PDFs in the attachment tests
